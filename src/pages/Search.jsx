@@ -16,7 +16,7 @@ export default function Search() {
         window.scrollTo(0, 0);
         
         const fetchData = async () => {
-            document.title = `${query} - zmov`;
+            document.title = `${query} - MeeeCloud`;
             if (loadingBarRef.current) loadingBarRef.current.continuousStart();
             try {
                 const response = await fetch(`https://api.themoviedb.org/3/search/multi?query=${query}&api_key=${apiKey}&include_adult=false`);
