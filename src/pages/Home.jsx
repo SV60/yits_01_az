@@ -10,7 +10,7 @@ export default function Home() {
   const apiKey = import.meta.env.VITE_API_KEY;
   
   useEffect(() => {
-    document.title = 'Home - zmov';
+    document.title = 'MeeeCloud · Home';
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
   
