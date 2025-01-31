@@ -36,7 +36,7 @@ export default function Info() {
   }, [type, id]);
 
   useEffect(() => {
-    document.title = 'Loading - zmov';
+    document.title = 'MeeeCloud · Loading';
     window.scrollTo(0, 0);
     const fetchData = async () => {
       if (loadingBarRef.current) loadingBarRef.current.continuousStart();
@@ -49,7 +49,7 @@ export default function Info() {
         const seasons = isSeries ? result.seasons.filter(season => season.season_number !== 0) : [];
         const selectedSeason = isSeries && seasons.length > 0 ? seasons[0].season_number : '';
 
-        document.title = `${result.title || result.name} - zmov`;
+        document.title = `${result.title || result.name} - MeeeCloud`;
 
         setData({
           item: result,
