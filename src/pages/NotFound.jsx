@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 export default function NotFound() {
     useEffect(() => {
-        document.title = `Not Found - zmov`;
+        document.title = `MeeeCloud · Not Found`;
     })
     return (
         <div className='w-screen h-screen flex flex-col justify-center items-center'>
