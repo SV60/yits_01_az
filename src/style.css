@@ -48,3 +48,7 @@ a {
 .swiper-button-next:hover, .swiper-button-prev:hover {
     opacity: 1 !important;
 }
+
+.w-\[100px\] {
+  width: 270px;
+}
