@@ -12,9 +12,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'robots.txt', 'apple-touch-icon.png'],
       manifest: {
-        name: 'zmov',
-        short_name: 'zmov',
-        description: 'Your movie app',
+        name: 'MeeeCloud',
+        short_name: 'mCloud',
+        description: 'Watch Movies and TV-Shows for Free',
         theme_color: '#000000',
         icons: [
           {
