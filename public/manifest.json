@@ -1,7 +1,7 @@
 {
-    "name": "zmov",
-    "short_name": "zmov",
-    "description": "Your movie app",
+    "name": "MeeeCloud",
+    "short_name": "mCloud",
+    "description": "Watch Movies and TV-Shows for Free",
     "icons": [
       {
         "src": "/pwa-192x192.png",
