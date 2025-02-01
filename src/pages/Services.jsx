@@ -14,7 +14,7 @@ export default function Services() {
   const location = useLocation();
   const loadingBarRef = useRef(null);
   let name = '';
-  document.title = `${service.charAt(0).toUpperCase() + service.slice(1)} - zmov`;
+  document.title = `${service.charAt(0).toUpperCase() + service.slice(1)} - MeeeCloud`;
 
   const apiKey = import.meta.env.VITE_API_KEY;
   let baseUrl = '';
