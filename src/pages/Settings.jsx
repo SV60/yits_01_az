@@ -5,7 +5,7 @@ import Watchlist from '../components/Watchlist'
 
 export default function Settings() {
     useEffect(() => {
-        document.title = `Settings - zmov`;
+        document.title = `MeeeCloud · Settings`;
         window.scrollTo(0, 0);
     })
 
