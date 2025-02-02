@@ -27,10 +27,12 @@ export default function Home() {
           <ServiceCard img="/images/max.svg" type="max" style={{backgroundImage: "linear-gradient(to right, rgba(239, 240, 255, 0.8), rgba(187, 166, 255, 0.8))"}} />
         </div>
         <div className='flex flex-col z-[2]'>
-          <Discover url={`https://api.themoviedb.org/3/trending/movie/week?api_key=${apiKey}&include_adult=false`} name="Trending movies this week" type="movie" />
-          <Discover url={`https://api.themoviedb.org/3/trending/tv/week?api_key=${apiKey}&include_adult=false`} name="Trending series this week" type="tv" />
-          <Discover url={`https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&sort_by=vote_count.desc&include_adult=false`} name="Top rated movies" type="movie" />
-          <Discover url={`https://api.themoviedb.org/3/discover/tv?api_key=${apiKey}&sort_by=vote_count.desc&include_adult=false`} name="Top rated series" type="tv" />
+          <Discover url={`https://api.themoviedb.org/3/trending/movie/week?api_key=${apiKey}&include_adult=false`} name="Trending Movies This Week" type="movie" />
+          <Discover url={`https://api.themoviedb.org/3/trending/tv/week?api_key=${apiKey}&include_adult=false`} name="Trending Series This Week" type="tv" />
+          <Discover url={`https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&sort_by=vote_count.desc&include_adult=false`} name="Top Rated Movies" type="movie" />
+          <Discover url={`https://api.themoviedb.org/3/discover/tv?api_key=${apiKey}&sort_by=vote_count.desc&include_adult=false`} name="Top Rated Series" type="tv" />
+          <Discover url={`https://api.themoviedb.org/3/movie/upcoming?api_key=${apiKey}&include_adult=false`} name="Upcoming Movies" type="movie" />
+          <Discover url={`https://api.themoviedb.org/3/tv/upcoming?api_key=${apiKey}&include_adult=false`} name="Upcoming Series" type="tv" />
           <Discover url={`https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_genres=10751&include_adult=false`} name="Family" type="movie" />
           <Discover url={`https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_genres=80&include_adult=false`} name="Crime" type="movie" />
           <Discover url={`https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_genres=27&include_adult=false`} name="Horror" type="movie" />
