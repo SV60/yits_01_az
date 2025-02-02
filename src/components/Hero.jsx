@@ -106,7 +106,7 @@ export default function Hero() {
                         >
                             {!isSmallScreen && loadedStates[heroItem.id]?.isVideoLoaded && (
                                 <iframe
-                                    src={`https://www.youtube.com/embed/${videos[heroItem.id]}?mute=1&autoplay=1&loop=1&rel=0&fs=0&controls=0&disablekb=1&playlist=${videos[heroItem.id]}&origin=https://watch.coen.ovh`}
+                                    src={`https://www.youtube.com/embed/${videos[heroItem.id]}?mute=1&autoplay=1&loop=1&rel=0&fs=0&controls=0&disablekb=1&playlist=${videos[heroItem.id]}&origin=https://mclod.vercel.app/`}
                                     title={heroItem.title}
                                     allowFullScreen
                                     loading="lazy"
