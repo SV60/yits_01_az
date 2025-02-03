@@ -199,8 +199,12 @@ export default function Info() {
                 </div>
                 <p className='border border-solid border-white border-opacity-50 rounded-lg px-1'>{getContentRating()}</p>
                 <p>
-                  {data.item["watch/providers"]?.results && Object.keys(data.item["watch/providers"].results).length > 0
-                    ? (data.item["watch/providers"].results.includes("4K") ? "4K" : "HD")
+                  {Object.keys(data.item["watch/providers"]?.results || {}).some(key => 
+                    data.item["watch/providers"].results[key]?.flatrate?.some(provider => 
+                      provider.display_priority >= 4 // Ajusta según la estructura real
+                    )
+                  ) ? "4K" 
+                    : Object.keys(data.item["watch/providers"]?.results || {}).length > 0 ? "HD" 
                     : "CAM"}
                 </p>
               </div>
