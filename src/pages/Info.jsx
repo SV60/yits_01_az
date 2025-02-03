@@ -198,7 +198,11 @@ export default function Info() {
                   <p>{parseFloat(data.item.vote_average).toFixed(1)}</p>
                 </div>
                 <p className='border border-solid border-white border-opacity-50 rounded-lg px-1'>{getContentRating()}</p>
-                <p>{Object.keys(data.item["watch/providers"]?.results || {}).length > 0 ? "HD" : "CAM"}</p>
+                <p>
+                  {data.item["watch/providers"]?.results && Object.keys(data.item["watch/providers"].results).length > 0
+                    ? (data.item["watch/providers"].results.includes("4K") ? "4K" : "HD")
+                    : "CAM"}
+                </p>
               </div>
               <div className='flex justify-center flex-wrap gap-2 [@media(max-height:500px)]:hidden'>
                 {data.genres.map(genre => (
