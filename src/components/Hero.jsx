@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay } from 'swiper/modules'
+import { Autoplay } from 'swiper/modules';
 import SwiperCore from 'swiper';
 import 'swiper/css';
 
@@ -19,27 +19,35 @@ export default function Hero() {
     useEffect(() => {
         const fetchHeroes = async () => {
             try {
-                const response = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&append_to_response=release_dates&include_adult=false`);
-                const data = await response.json();
-                setHeroItems(data.results);
+                // Fetch movies
+                const moviesResponse = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&append_to_response=release_dates&include_adult=false`);
+                const moviesData = await moviesResponse.json();
+                
+                // Fetch series
+                const seriesResponse = await fetch(`https://api.themoviedb.org/3/discover/tv?api_key=${apiKey}&append_to_response=release_dates&include_adult=false`);
+                const seriesData = await seriesResponse.json();
 
-                const promises = data.results.map(async (movie) => {
-                    const imagesResponse = await fetch(`https://api.themoviedb.org/3/movie/${movie.id}/images?api_key=${apiKey}`);
+                // Combine movies and series
+                const combinedData = [...moviesData.results, ...seriesData.results];
+                setHeroItems(combinedData);
+
+                const promises = combinedData.map(async (item) => {
+                    const imagesResponse = await fetch(`https://api.themoviedb.org/3/${item.media_type === 'movie' ? 'movie' : 'tv'}/${item.id}/images?api_key=${apiKey}`);
                     const imagesData = await imagesResponse.json();
                     const logo = imagesData.logos.find(logo => logo.iso_639_1 === "en")?.file_path;
 
                     if (logo) {
-                        setLogoImages(prevState => ({ ...prevState, [movie.id]: logo }));
+                        setLogoImages(prevState => ({ ...prevState, [item.id]: logo }));
                     }
 
-                    const videoResponse = await fetch(`https://api.themoviedb.org/3/movie/${movie.id}/videos?api_key=${apiKey}`);
+                    const videoResponse = await fetch(`https://api.themoviedb.org/3/${item.media_type === 'movie' ? 'movie' : 'tv'}/${item.id}/videos?api_key=${apiKey}`);
                     const videoData = await videoResponse.json();
                     const firstVideo = videoData.results.find(video => video.type === "Trailer")?.key;
 
-                    setVideos(prevState => ({ ...prevState, [movie.id]: firstVideo }));
+                    setVideos(prevState => ({ ...prevState, [item.id]: firstVideo }));
                     setLoadedStates(prevState => ({
                         ...prevState,
-                        [movie.id]: {
+                        [item.id]: {
                             isImageLoaded: false,
                             isVideoLoaded: !!firstVideo
                         }
@@ -64,10 +72,10 @@ export default function Hero() {
         return () => mediaQuery.removeEventListener('change', handleMediaChange);
     }, [apiKey]);
 
-    const handleImageLoad = (movieId) => {
+    const handleImageLoad = (itemId) => {
         setLoadedStates(prevState => ({
             ...prevState,
-            [movieId]: { ...prevState[movieId], isImageLoaded: true }
+            [itemId]: { ...prevState[itemId], isImageLoaded: true }
         }));
     };
 
@@ -119,12 +127,12 @@ export default function Hero() {
                             <div className='flex flex-col ml-12 z-[1] gap-1 max-lg:mx-4 max-2xl:mx-6'>
                                 <div className='flex text-[4rem] font-semibold mb-3 max-lg:justify-center max-lg:text-[3rem] [@media(max-height:500px)]:mb-0'>
                                     <span className="alt-text hidden line-clamp-2 text-center [@media(max-height:500px)]:block">
-                                        {heroItem.title}
+                                        {heroItem.title || heroItem.name} {/* Cambiar a name para series */}
                                     </span>
                                     <img 
                                         src={logoImages[heroItem.id] && `https://image.tmdb.org/t/p/w500${logoImages[heroItem.id]}`} 
                                         className='max-w-[60vw] max-h-[30vh] max-lg:max-w-[90vw] max-md:max-w-full [@media(max-height:500px)]:hidden'
-                                        alt={heroItem.title} 
+                                        alt={heroItem.title || heroItem.name} 
                                     />
                                 </div>
                                 <div className='flex gap-[10px] max-lg:justify-center'>
@@ -134,7 +142,7 @@ export default function Hero() {
                                     </div>
                                     <div className='flex items-center gap-1'>
                                         <i className="fa-light fa-calendar-lines"></i>
-                                        <p>{heroItem.release_date}</p>
+                                        <p>{heroItem.release_date || heroItem.first_air_date}</p> {/* Cambiar a first_air_date para series */}
                                     </div>
                                     <p className='py-[1px] px-[4px] outline-1 outline outline-gray-400 rounded-md'>{(heroItem.original_language).toUpperCase()}</p>
                                 </div>
@@ -142,10 +150,10 @@ export default function Hero() {
                                     <p>{heroItem.overview}</p>
                                 </div>
                                 <div className='flex gap-2 mt-2 max-lg:justify-center'>
-                                    <Link to={`/watch/movie/${heroItem.id}`} className='flex items-center gap-2 px-4 py-2  bg-white rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-50'>
+                                    <Link to={`/watch/${heroItem.media_type}/${heroItem.id}`} className='flex items-center gap-2 px-4 py-2  bg-white rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-50'>
                                         <i className="fa-solid fa-play text-black text-xl" alt="Play Icon" /><p className='text-black'>Watch</p>
                                     </Link>
-                                    <Link to={`/info/movie/${heroItem.id}`} className='flex items-center gap-[10px] px-4 py-2 bg-white/20 rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-40'>
+                                    <Link to={`/info/${heroItem.media_type}/${heroItem.id}`} className='flex items-center gap-[10px] px-4 py-2 bg-white/20 rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-40'>
                                         <i className="fa-regular fa-circle-info text-xl" alt="info-icon" /><p>Info</p>
                                     </Link>
                                 </div>
