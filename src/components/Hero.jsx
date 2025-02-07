@@ -14,7 +14,6 @@ export default function Hero() {
     const [isSmallScreen, setIsSmallScreen] = useState(false);
     const [loadedStates, setLoadedStates] = useState({});
     const [isMuted, setIsMuted] = useState({}); // Ahora es un objeto
-    const [autoplayEnabled, setAutoplayEnabled] = useState(true); // Nuevo estado para controlar la reproducción automática
 
     const apiKey = import.meta.env.VITE_API_KEY;
 
@@ -49,6 +48,7 @@ export default function Hero() {
                 });
 
                 await Promise.all(promises);
+
             } catch (error) {
                 console.error('Error fetching heroes:', error);
             }
@@ -83,32 +83,30 @@ export default function Hero() {
     };
 
     const handleSlideChange = (swiper) => {
+        // Mutear todos los videos al cambiar de slide
+        setIsMuted((prev) => {
+            const updated = {};
+            heroItems.forEach((item) => {
+                updated[item.id] = true; // Mutea todos
+            });
+            return updated;
+        });
         preloadNext(swiper, 2);
     };
 
     const handleMuteToggle = (movieId) => {
-        const currentMuteState = isMuted[movieId] || false;
-        const newMuteState = !currentMuteState;
-
         setIsMuted((prev) => ({
             ...prev,
-            [movieId]: newMuteState, // Cambia el mute solo para el video actual
+            [movieId]: !prev[movieId], // Cambia el mute solo para el video actual
         }));
-
-        // Activar o desactivar autoplay basado en el estado de mute
-        if (newMuteState) {
-            setAutoplayEnabled(true); // Si se mutea, habilitar autoplay
-        } else {
-            setAutoplayEnabled(false); // Si se desmutea, deshabilitar autoplay
-        }
     };
 
     const swiperParams = {
         centeredSlides: true,
-        autoplay: autoplayEnabled ? {
+        autoplay: {
             delay: 15000,
             disableOnInteraction: false
-        } : false,
+        },
         loop: heroItems.length > 1,
         onSlideChange: handleSlideChange,
         onInit: (swiper) => preloadNext(swiper, 2),
