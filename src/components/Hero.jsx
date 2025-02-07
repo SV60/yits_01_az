@@ -83,36 +83,23 @@ export default function Hero() {
     };
 
     const handleSlideChange = (swiper) => {
-        // Mutear todos los videos al cambiar de slide
-        setIsMuted((prev) => {
-            const updated = {};
-            heroItems.forEach((item) => {
-                updated[item.id] = true; // Mutea todos
-            });
-            return updated;
-        });
         preloadNext(swiper, 2);
-
-        // Desactivar el autoplay si el video actual está desmuteado
-        const currentSlideId = heroItems[swiper.activeIndex]?.id;
-        if (currentSlideId && !isMuted[currentSlideId]) {
-            setAutoplayEnabled(false);
-        } else {
-            setAutoplayEnabled(true);
-        }
     };
 
     const handleMuteToggle = (movieId) => {
+        const currentMuteState = isMuted[movieId] || false;
+        const newMuteState = !currentMuteState;
+
         setIsMuted((prev) => ({
             ...prev,
-            [movieId]: !prev[movieId], // Cambia el mute solo para el video actual
+            [movieId]: newMuteState, // Cambia el mute solo para el video actual
         }));
 
         // Activar o desactivar autoplay basado en el estado de mute
-        if (isMuted[movieId]) {
-            setAutoplayEnabled(true); // Si se activa el mute, habilitar autoplay
+        if (newMuteState) {
+            setAutoplayEnabled(true); // Si se mutea, habilitar autoplay
         } else {
-            setAutoplayEnabled(false); // Si se desactiva el mute, deshabilitar autoplay
+            setAutoplayEnabled(false); // Si se desmutea, deshabilitar autoplay
         }
     };
 
