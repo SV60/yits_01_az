@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
@@ -13,8 +13,7 @@ export default function Hero() {
     const [videos, setVideos] = useState({});
     const [isSmallScreen, setIsSmallScreen] = useState(false);
     const [loadedStates, setLoadedStates] = useState({});
-    const [isMuted, setIsMuted] = useState(true); // Estado para controlar el muteo
-    const iframeRefs = useRef({}); // Referencia para cada iframe
+    const [isMuted, setIsMuted] = useState({}); // Ahora es un objeto
 
     const apiKey = import.meta.env.VITE_API_KEY;
 
@@ -84,27 +83,22 @@ export default function Hero() {
     };
 
     const handleSlideChange = (swiper) => {
-        // Mute all videos when the slide changes
-        setIsMuted(true);
+        // Mutear todos los videos al cambiar de slide
+        setIsMuted((prev) => {
+            const updated = {};
+            heroItems.forEach((item) => {
+                updated[item.id] = true; // Mutea todos
+            });
+            return updated;
+        });
         preloadNext(swiper, 2);
     };
 
     const handleMuteToggle = (movieId) => {
-        // Toggle mute/unmute for specific video
-        const iframe = iframeRefs.current[movieId];
-        const muteState = isMuted ? 1 : 0;
-
-        // Send message to YouTube iframe to mute/unmute
-        iframe.contentWindow.postMessage(
-            JSON.stringify({
-                event: 'command',
-                func: isMuted ? 'unMute' : 'mute',
-                mute: muteState,
-            }),
-            '*'
-        );
-
-        setIsMuted(!isMuted); // Update local state for mute
+        setIsMuted((prev) => ({
+            ...prev,
+            [movieId]: !prev[movieId], // Cambia el mute solo para el video actual
+        }));
     };
 
     const swiperParams = {
@@ -134,8 +128,7 @@ export default function Hero() {
                         >
                             {!isSmallScreen && loadedStates[heroItem.id]?.isVideoLoaded && (
                                 <iframe
-                                    ref={(el) => iframeRefs.current[heroItem.id] = el}
-                                    src={`https://www.youtube.com/embed/${videos[heroItem.id]}?mute=${isMuted ? 1 : 0}&autoplay=1&loop=1&rel=0&fs=0&controls=0&disablekb=1&playlist=${videos[heroItem.id]}&origin=https://mclod.vercel.app/&enablejsapi=1`}
+                                    src={`https://www.youtube.com/embed/${videos[heroItem.id]}?mute=${isMuted[heroItem.id] ? 1 : 0}&autoplay=1&loop=1&rel=0&fs=0&controls=0&disablekb=1&playlist=${videos[heroItem.id]}&origin=https://mclod.vercel.app/`}
                                     title={heroItem.title}
                                     allowFullScreen
                                     loading="lazy"
@@ -182,7 +175,7 @@ export default function Hero() {
                                         onClick={() => handleMuteToggle(heroItem.id)} 
                                         className='flex items-center gap-2 px-4 py-2 bg-white rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-50'
                                     >
-                                        <i className={`fa-solid ${isMuted ? 'fa-volume-xmark' : 'fa-volume-high'} text-black text-xl`} alt="Mute/Unmute Icon" />
+                                        <i className={`fa-solid ${isMuted[heroItem.id] ? 'fa-volume-xmark' : 'fa-volume-high'} text-black text-xl`} alt="Mute/Unmute Icon" />
                                     </button>
                                 </div>
                             </div>
