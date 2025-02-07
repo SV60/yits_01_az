@@ -14,7 +14,6 @@ export default function Hero() {
     const [isSmallScreen, setIsSmallScreen] = useState(false);
     const [loadedStates, setLoadedStates] = useState({});
     const [isMuted, setIsMuted] = useState(true); // Estado para controlar el muteo
-    const [activeVideoId, setActiveVideoId] = useState(null); // Estado para el video activo
 
     const apiKey = import.meta.env.VITE_API_KEY;
 
@@ -84,10 +83,12 @@ export default function Hero() {
     };
 
     const handleSlideChange = (swiper) => {
-        // Mute all videos when the slide changes
-        setIsMuted(true);
-        setActiveVideoId(heroItems[swiper.activeIndex].id); // Actualiza el video activo
+        setIsMuted(true); // Mute the video when changing slides
         preloadNext(swiper, 2);
+    };
+
+    const toggleMute = () => {
+        setIsMuted(prev => !prev); // Toggle mute state
     };
 
     const swiperParams = {
@@ -117,7 +118,7 @@ export default function Hero() {
                         >
                             {!isSmallScreen && loadedStates[heroItem.id]?.isVideoLoaded && (
                                 <iframe
-                                    src={`https://www.youtube.com/embed/${videos[heroItem.id]}?mute=${isMuted ? 1 : 0}&autoplay=${activeVideoId === heroItem.id ? 1 : 0}&loop=1&rel=0&fs=0&controls=0&disablekb=1&playlist=${videos[heroItem.id]}&origin=https://mclod.vercel.app/`}
+                                    src={`https://www.youtube.com/embed/${videos[heroItem.id]}?mute=${isMuted ? 1 : 0}&autoplay=1&loop=1&rel=0&fs=0&controls=0&disablekb=1&playlist=${videos[heroItem.id]}&origin=https://mclod.vercel.app/`}
                                     title={heroItem.title}
                                     allowFullScreen
                                     loading="lazy"
@@ -159,12 +160,10 @@ export default function Hero() {
                                     <Link to={`/info/movie/${heroItem.id}`} className='flex items-center gap-[10px] px-4 py-2 bg-white/20 rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-40'>
                                         <i className="fa-regular fa-circle-info text-xl" alt="info-icon" /><p>Info</p>
                                     </Link>
-                                    {/* Botón de muteo/desmuteo como ícono */}
-                                    <button 
-                                        onClick={() => setIsMuted(prev => !prev)} 
-                                        className='flex items-center gap-2 px-4 py-2 bg-white rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-50'
-                                    >
-                                        <i className={`fa-solid ${isMuted ? 'fa-volume-xmark' : 'fa-volume-high'} text-black text-xl`} alt="Mute/Unmute Icon" />
+                                    {/* Botón para mutear/desmutear */}
+                                    <button onClick={toggleMute} className='flex items-center gap-2 px-4 py-2 bg-white rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-50'>
+                                        <i className={`fa-solid ${isMuted ? 'fa-volume-xmark' : 'fa-volume-high'}`}></i>
+                                        <p>{isMuted ? 'Unmute' : 'Mute'}</p>
                                     </button>
                                 </div>
                             </div>
