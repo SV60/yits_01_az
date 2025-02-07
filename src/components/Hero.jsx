@@ -13,8 +13,7 @@ export default function Hero() {
     const [videos, setVideos] = useState({});
     const [isSmallScreen, setIsSmallScreen] = useState(false);
     const [loadedStates, setLoadedStates] = useState({});
-    const [isMuted, setIsMuted] = useState({});
-    const [autoplayEnabled, setAutoplayEnabled] = useState(true); // Nuevo estado para controlar autoplay
+    const [isMuted, setIsMuted] = useState({}); // Ahora es un objeto
 
     const apiKey = import.meta.env.VITE_API_KEY;
 
@@ -84,10 +83,11 @@ export default function Hero() {
     };
 
     const handleSlideChange = (swiper) => {
+        // Mutear todos los videos al cambiar de slide
         setIsMuted((prev) => {
             const updated = {};
             heroItems.forEach((item) => {
-                updated[item.id] = true; 
+                updated[item.id] = true; // Mutea todos
             });
             return updated;
         });
@@ -97,17 +97,16 @@ export default function Hero() {
     const handleMuteToggle = (movieId) => {
         setIsMuted((prev) => ({
             ...prev,
-            [movieId]: !prev[movieId],
+            [movieId]: !prev[movieId], // Cambia el mute solo para el video actual
         }));
-    };
-
-    const toggleAutoplay = () => {
-        setAutoplayEnabled((prev) => !prev);
     };
 
     const swiperParams = {
         centeredSlides: true,
-        autoplay: autoplayEnabled ? { delay: 15000, disableOnInteraction: false } : false, // Control del autoplay
+        autoplay: {
+            delay: 15000,
+            disableOnInteraction: false
+        },
         loop: heroItems.length > 1,
         onSlideChange: handleSlideChange,
         onInit: (swiper) => preloadNext(swiper, 2),
@@ -171,12 +170,12 @@ export default function Hero() {
                                     <Link to={`/info/movie/${heroItem.id}`} className='flex items-center gap-[10px] px-4 py-2 bg-white/20 rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-40'>
                                         <i className="fa-regular fa-circle-info text-xl" alt="info-icon" /><p>Info</p>
                                     </Link>
-                                    {/* Botón para activar/desactivar autoplay con ícono */}
+                                    {/* Botón de muteo/desmuteo como ícono */}
                                     <button 
-                                        onClick={toggleAutoplay} 
+                                        onClick={() => handleMuteToggle(heroItem.id)} 
                                         className='flex items-center gap-2 px-4 py-2 bg-white rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-50'
                                     >
-                                        <i className={`fa-solid ${autoplayEnabled ? 'fa-pause' : 'fa-play'} text-black text-xl`} alt="Autoplay Toggle" />
+                                        <i className={`fa-solid ${isMuted[heroItem.id] ? 'fa-volume-xmark' : 'fa-volume-high'} text-black text-xl`} alt="Mute/Unmute Icon" />
                                     </button>
                                 </div>
                             </div>
