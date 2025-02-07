@@ -170,7 +170,7 @@ export default function Hero() {
                                     </Link>
                                     <Link to={`/info/movie/${heroItem.id}`} className='flex items-center gap-[10px] px-4 py-2 bg-white/20 rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-40'>
                                         <i className="fa-regular fa-circle-info text-xl" alt="info-icon" /><p>Info</p>
-                                    </div>
+                                    </Link>
                                     {/* Botón para activar/desactivar autoplay con ícono */}
                                     <button 
                                         onClick={toggleAutoplay} 
