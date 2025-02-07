@@ -14,7 +14,7 @@ export default function Hero() {
     const [isSmallScreen, setIsSmallScreen] = useState(false);
     const [loadedStates, setLoadedStates] = useState({});
     const [isMuted, setIsMuted] = useState(true); // Estado para controlar el muteo
-    const [activeVideoId, setActiveVideoId] = useState(null); // Estado para controlar el video activo
+    const [activeVideoId, setActiveVideoId] = useState(null); // Estado para el video activo
 
     const apiKey = import.meta.env.VITE_API_KEY;
 
@@ -86,12 +86,8 @@ export default function Hero() {
     const handleSlideChange = (swiper) => {
         // Mute all videos when the slide changes
         setIsMuted(true);
-        setActiveVideoId(null); // Reset active video ID
+        setActiveVideoId(heroItems[swiper.activeIndex].id); // Actualiza el video activo
         preloadNext(swiper, 2);
-    };
-
-    const handleVideoLoad = (movieId) => {
-        setActiveVideoId(movieId); // Set the active video ID
     };
 
     const swiperParams = {
@@ -121,15 +117,12 @@ export default function Hero() {
                         >
                             {!isSmallScreen && loadedStates[heroItem.id]?.isVideoLoaded && (
                                 <iframe
-                                    src={`https://www.youtube.com/embed/${videos[heroItem.id]}?mute=${isMuted ? 1 : 0}&autoplay=1&loop=1&rel=0&fs=0&controls=0&disablekb=1&playlist=${videos[heroItem.id]}&origin=https://mclod.vercel.app/`}
+                                    src={`https://www.youtube.com/embed/${videos[heroItem.id]}?mute=${isMuted ? 1 : 0}&autoplay=${activeVideoId === heroItem.id ? 1 : 0}&loop=1&rel=0&fs=0&controls=0&disablekb=1&playlist=${videos[heroItem.id]}&origin=https://mclod.vercel.app/`}
                                     title={heroItem.title}
                                     allowFullScreen
                                     loading="lazy"
                                     className={`absolute w-[150vw] h-[200vh] top-[-50%] left-[-25%] object-cover border-none transition-opacity duration-500 ease-in ${loadedStates[heroItem.id]?.isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
-                                    onLoad={() => {
-                                        handleImageLoad(heroItem.id);
-                                        handleVideoLoad(heroItem.id); // Set the active video when it loads
-                                    }}
+                                    onLoad={() => handleImageLoad(heroItem.id)}
                                 />
                             )}
                         </div>
