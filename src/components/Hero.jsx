@@ -14,6 +14,7 @@ export default function Hero() {
     const [isSmallScreen, setIsSmallScreen] = useState(false);
     const [loadedStates, setLoadedStates] = useState({});
     const [isMuted, setIsMuted] = useState({}); // Ahora es un objeto
+    const [autoplayEnabled, setAutoplayEnabled] = useState(true); // Nuevo estado para controlar la reproducción automática
 
     const apiKey = import.meta.env.VITE_API_KEY;
 
@@ -48,7 +49,6 @@ export default function Hero() {
                 });
 
                 await Promise.all(promises);
-
             } catch (error) {
                 console.error('Error fetching heroes:', error);
             }
@@ -92,6 +92,14 @@ export default function Hero() {
             return updated;
         });
         preloadNext(swiper, 2);
+
+        // Desactivar el autoplay si el video actual está desmuteado
+        const currentSlideId = heroItems[swiper.activeIndex]?.id;
+        if (currentSlideId && !isMuted[currentSlideId]) {
+            setAutoplayEnabled(false);
+        } else {
+            setAutoplayEnabled(true);
+        }
     };
 
     const handleMuteToggle = (movieId) => {
@@ -99,14 +107,21 @@ export default function Hero() {
             ...prev,
             [movieId]: !prev[movieId], // Cambia el mute solo para el video actual
         }));
+
+        // Activar o desactivar autoplay basado en el estado de mute
+        if (isMuted[movieId]) {
+            setAutoplayEnabled(true); // Si se activa el mute, habilitar autoplay
+        } else {
+            setAutoplayEnabled(false); // Si se desactiva el mute, deshabilitar autoplay
+        }
     };
 
     const swiperParams = {
         centeredSlides: true,
-        autoplay: {
+        autoplay: autoplayEnabled ? {
             delay: 15000,
             disableOnInteraction: false
-        },
+        } : false,
         loop: heroItems.length > 1,
         onSlideChange: handleSlideChange,
         onInit: (swiper) => preloadNext(swiper, 2),
