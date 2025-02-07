@@ -14,6 +14,7 @@ export default function Hero() {
     const [isSmallScreen, setIsSmallScreen] = useState(false);
     const [loadedStates, setLoadedStates] = useState({});
     const [isMuted, setIsMuted] = useState(true); // Estado para controlar el muteo
+    const [activeVideoId, setActiveVideoId] = useState(null); // Estado para controlar el video activo
 
     const apiKey = import.meta.env.VITE_API_KEY;
 
@@ -85,7 +86,12 @@ export default function Hero() {
     const handleSlideChange = (swiper) => {
         // Mute all videos when the slide changes
         setIsMuted(true);
+        setActiveVideoId(null); // Reset active video ID
         preloadNext(swiper, 2);
+    };
+
+    const handleVideoLoad = (movieId) => {
+        setActiveVideoId(movieId); // Set the active video ID
     };
 
     const swiperParams = {
@@ -120,7 +126,10 @@ export default function Hero() {
                                     allowFullScreen
                                     loading="lazy"
                                     className={`absolute w-[150vw] h-[200vh] top-[-50%] left-[-25%] object-cover border-none transition-opacity duration-500 ease-in ${loadedStates[heroItem.id]?.isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
-                                    onLoad={() => handleImageLoad(heroItem.id)}
+                                    onLoad={() => {
+                                        handleImageLoad(heroItem.id);
+                                        handleVideoLoad(heroItem.id); // Set the active video when it loads
+                                    }}
                                 />
                             )}
                         </div>
