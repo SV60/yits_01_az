@@ -119,9 +119,9 @@ export default function Hero() {
                             }}
                             className='absolute w-screen h-screen overflow-hidden z-[-1] opacity-40'
                         >
-                            {!isSmallScreen && loadedStates[heroItem.id]?.isVideoLoaded && activeVideoId === heroItem.id && (
+                            {!isSmallScreen && loadedStates[heroItem.id]?.isVideoLoaded && (
                                 <iframe
-                                    src={`https://www.youtube.com/embed/${videos[heroItem.id]}?mute=${isMuted ? 1 : 0}&autoplay=1&loop=1&rel=0&fs=0&controls=0&disablekb=1&playlist=${videos[heroItem.id]}&origin=https://mclod.vercel.app/`}
+                                    src={`https://www.youtube.com/embed/${videos[heroItem.id]}?mute=${isMuted ? 1 : 0}&autoplay=${activeVideoId === heroItem.id ? 1 : 0}&loop=1&rel=0&fs=0&controls=0&disablekb=1&playlist=${videos[heroItem.id]}&origin=https://mclod.vercel.app/`}
                                     title={heroItem.title}
                                     allowFullScreen
                                     loading="lazy"
