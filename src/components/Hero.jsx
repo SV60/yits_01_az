@@ -13,7 +13,7 @@ export default function Hero() {
     const [videos, setVideos] = useState({});
     const [isSmallScreen, setIsSmallScreen] = useState(false);
     const [loadedStates, setLoadedStates] = useState({});
-    const [isMuted, setIsMuted] = useState(true); // Estado para controlar el muteo
+    const [isMuted, setIsMuted] = useState({}); // Ahora es un objeto
 
     const apiKey = import.meta.env.VITE_API_KEY;
 
@@ -82,6 +82,25 @@ export default function Hero() {
             });
     };
 
+    const handleSlideChange = (swiper) => {
+        // Mutear todos los videos al cambiar de slide
+        setIsMuted((prev) => {
+            const updated = {};
+            heroItems.forEach((item) => {
+                updated[item.id] = true; // Mutea todos
+            });
+            return updated;
+        });
+        preloadNext(swiper, 2);
+    };
+
+    const handleMuteToggle = (movieId) => {
+        setIsMuted((prev) => ({
+            ...prev,
+            [movieId]: !prev[movieId], // Cambia el mute solo para el video actual
+        }));
+    };
+
     const swiperParams = {
         centeredSlides: true,
         autoplay: {
@@ -89,7 +108,7 @@ export default function Hero() {
             disableOnInteraction: false
         },
         loop: heroItems.length > 1,
-        onSlideChange: (swiper) => preloadNext(swiper, 2),
+        onSlideChange: handleSlideChange,
         onInit: (swiper) => preloadNext(swiper, 2),
         id: "swiper"
     };
@@ -109,7 +128,7 @@ export default function Hero() {
                         >
                             {!isSmallScreen && loadedStates[heroItem.id]?.isVideoLoaded && (
                                 <iframe
-                                    src={`https://www.youtube.com/embed/${videos[heroItem.id]}?mute=${isMuted ? 1 : 0}&autoplay=1&loop=1&rel=0&fs=0&controls=0&disablekb=1&playlist=${videos[heroItem.id]}&origin=https://mclod.vercel.app/`}
+                                    src={`https://www.youtube.com/embed/${videos[heroItem.id]}?mute=${isMuted[heroItem.id] ? 1 : 0}&autoplay=1&loop=1&rel=0&fs=0&controls=0&disablekb=1&playlist=${videos[heroItem.id]}&origin=https://mclod.vercel.app/`}
                                     title={heroItem.title}
                                     allowFullScreen
                                     loading="lazy"
@@ -151,13 +170,12 @@ export default function Hero() {
                                     <Link to={`/info/movie/${heroItem.id}`} className='flex items-center gap-[10px] px-4 py-2 bg-white/20 rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-40'>
                                         <i className="fa-regular fa-circle-info text-xl" alt="info-icon" /><p>Info</p>
                                     </Link>
-                                    {/* Botón de muteo/desmuteo */}
+                                    {/* Botón de muteo/desmuteo como ícono */}
                                     <button 
-                                        onClick={() => setIsMuted(prev => !prev)} 
+                                        onClick={() => handleMuteToggle(heroItem.id)} 
                                         className='flex items-center gap-2 px-4 py-2 bg-white rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-50'
                                     >
-                                        <i className={`fa-solid ${isMuted ? 'fa-volume-xmark' : 'fa-volume-high'} text-black text-xl`} alt="Mute/Unmute Icon" />
-                                        <p className='text-black'>{isMuted ? 'Unmute' : 'Mute'}</p>
+                                        <i className={`fa-solid ${isMuted[heroItem.id] ? 'fa-volume-xmark' : 'fa-volume-high'} text-black text-xl`} alt="Mute/Unmute Icon" />
                                     </button>
                                 </div>
                             </div>
