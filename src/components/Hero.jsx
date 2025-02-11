@@ -99,7 +99,7 @@ export default function Hero() {
         setIsMuted((prev) => {
             const newMutedState = !prev[movieId];
             // Cambiar el estado de autoplay basado en el muteo
-            setIsAutoplay(!newMutedState);
+            setIsAutoplay(!newMutedState); // Detener el autoplay si se desmutea
             return {
                 ...prev,
                 [movieId]: newMutedState, // Cambia el mute solo para el video actual
