@@ -14,7 +14,6 @@ export default function Hero() {
     const [isSmallScreen, setIsSmallScreen] = useState(false);
     const [loadedStates, setLoadedStates] = useState({});
     const [isMuted, setIsMuted] = useState({}); // Ahora es un objeto
-    const [isAutoplay, setIsAutoplay] = useState(true); // Estado para controlar el autoplay
 
     const apiKey = import.meta.env.VITE_API_KEY;
 
@@ -96,23 +95,18 @@ export default function Hero() {
     };
 
     const handleMuteToggle = (movieId) => {
-        setIsMuted((prev) => {
-            const newMutedState = !prev[movieId];
-            // Cambiar el estado de autoplay basado en el muteo
-            setIsAutoplay(!newMutedState); // Detener el autoplay si se desmutea
-            return {
-                ...prev,
-                [movieId]: newMutedState, // Cambia el mute solo para el video actual
-            };
-        });
+        setIsMuted((prev) => ({
+            ...prev,
+            [movieId]: !prev[movieId], // Cambia el mute solo para el video actual
+        }));
     };
 
     const swiperParams = {
         centeredSlides: true,
-        autoplay: isAutoplay ? {
+        autoplay: {
             delay: 15000,
             disableOnInteraction: false
-        } : false, // Desactiva el autoplay si no está en modo mudo
+        },
         loop: heroItems.length > 1,
         onSlideChange: handleSlideChange,
         onInit: (swiper) => preloadNext(swiper, 2),
