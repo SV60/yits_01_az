@@ -13,8 +13,8 @@ export default function Hero() {
     const [videos, setVideos] = useState({});
     const [isSmallScreen, setIsSmallScreen] = useState(false);
     const [loadedStates, setLoadedStates] = useState({});
-    const [isMuted, setIsMuted] = useState({}); 
-    const [autoplayEnabled, setAutoplayEnabled] = useState(true); // Nuevo estado para controlar el autoplay
+    const [isMuted, setIsMuted] = useState({}); // Ahora es un objeto
+    const [isAutoplay, setIsAutoplay] = useState(true); // Estado para controlar el autoplay
 
     const apiKey = import.meta.env.VITE_API_KEY;
 
@@ -66,11 +66,6 @@ export default function Hero() {
         return () => mediaQuery.removeEventListener('change', handleMediaChange);
     }, [apiKey]);
 
-    useEffect(() => {
-        // Si hay algún video no muteado, deshabilitar autoplay
-        setAutoplayEnabled(!Object.values(isMuted).includes(false));
-    }, [isMuted]);
-
     const handleImageLoad = (movieId) => {
         setLoadedStates(prevState => ({
             ...prevState,
@@ -89,6 +84,7 @@ export default function Hero() {
     };
 
     const handleSlideChange = (swiper) => {
+        // Mutear todos los videos al cambiar de slide
         setIsMuted((prev) => {
             const updated = {};
             heroItems.forEach((item) => {
@@ -102,20 +98,21 @@ export default function Hero() {
     const handleMuteToggle = (movieId) => {
         setIsMuted((prev) => {
             const newMutedState = !prev[movieId];
-            // Actualizar el estado de autoplay basado en muteo
-            const updatedMutedStates = { ...prev, [movieId]: newMutedState };
-            const shouldAutoplay = !Object.values(updatedMutedStates).includes(false);
-            setAutoplayEnabled(shouldAutoplay);
-            return updatedMutedStates;
+            // Cambiar el estado de autoplay basado en el muteo
+            setIsAutoplay(!newMutedState);
+            return {
+                ...prev,
+                [movieId]: newMutedState, // Cambia el mute solo para el video actual
+            };
         });
     };
 
     const swiperParams = {
         centeredSlides: true,
-        autoplay: autoplayEnabled ? {
+        autoplay: isAutoplay ? {
             delay: 15000,
             disableOnInteraction: false
-        } : false, // Desactivamos el autoplay si `autoplayEnabled` es false
+        } : false, // Desactiva el autoplay si no está en modo mudo
         loop: heroItems.length > 1,
         onSlideChange: handleSlideChange,
         onInit: (swiper) => preloadNext(swiper, 2),
