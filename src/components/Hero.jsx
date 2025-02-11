@@ -14,6 +14,7 @@ export default function Hero() {
     const [isSmallScreen, setIsSmallScreen] = useState(false);
     const [loadedStates, setLoadedStates] = useState({});
     const [isMuted, setIsMuted] = useState({}); 
+    const [autoplayEnabled, setAutoplayEnabled] = useState(true); // Nuevo estado para controlar el autoplay
 
     const apiKey = import.meta.env.VITE_API_KEY;
 
@@ -65,6 +66,11 @@ export default function Hero() {
         return () => mediaQuery.removeEventListener('change', handleMediaChange);
     }, [apiKey]);
 
+    useEffect(() => {
+        // Si hay algún video no muteado, deshabilitar autoplay
+        setAutoplayEnabled(!Object.values(isMuted).includes(false));
+    }, [isMuted]);
+
     const handleImageLoad = (movieId) => {
         setLoadedStates(prevState => ({
             ...prevState,
@@ -83,7 +89,6 @@ export default function Hero() {
     };
 
     const handleSlideChange = (swiper) => {
-        // Mutear todos los videos al cambiar de slide
         setIsMuted((prev) => {
             const updated = {};
             heroItems.forEach((item) => {
@@ -95,18 +100,22 @@ export default function Hero() {
     };
 
     const handleMuteToggle = (movieId) => {
-        setIsMuted((prev) => ({
-            ...prev,
-            [movieId]: !prev[movieId], // Cambia el mute solo para el video actual
-        }));
+        setIsMuted((prev) => {
+            const newMutedState = !prev[movieId];
+            // Actualizar el estado de autoplay basado en muteo
+            const updatedMutedStates = { ...prev, [movieId]: newMutedState };
+            const shouldAutoplay = !Object.values(updatedMutedStates).includes(false);
+            setAutoplayEnabled(shouldAutoplay);
+            return updatedMutedStates;
+        });
     };
 
     const swiperParams = {
         centeredSlides: true,
-        autoplay: {
+        autoplay: autoplayEnabled ? {
             delay: 15000,
-            disableOnInteraction: true // Cambia esto a true
-        },
+            disableOnInteraction: false
+        } : false, // Desactivamos el autoplay si `autoplayEnabled` es false
         loop: heroItems.length > 1,
         onSlideChange: handleSlideChange,
         onInit: (swiper) => preloadNext(swiper, 2),
