@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
@@ -13,8 +13,7 @@ export default function Hero() {
     const [videos, setVideos] = useState({});
     const [isSmallScreen, setIsSmallScreen] = useState(false);
     const [loadedStates, setLoadedStates] = useState({});
-    const [isMuted, setIsMuted] = useState({}); 
-    const swiperRef = useRef(null); 
+    const [isMuted, setIsMuted] = useState({});
 
     const apiKey = import.meta.env.VITE_API_KEY;
 
@@ -87,48 +86,39 @@ export default function Hero() {
         setIsMuted((prev) => {
             const updated = {};
             heroItems.forEach((item) => {
-                updated[item.id] = true; 
+                updated[item.id] = true; // Mutea todos
             });
             return updated;
         });
         preloadNext(swiper, 2);
     };
 
-    const updateAutoplayDelay = (swiper, delay) => {
-        if (swiper && swiper.autoplay) {
-            swiper.autoplay.stop();
-            swiper.params.autoplay.delay = delay;
-            swiper.autoplay.start();
-        }
+    const handleMuteToggle = (movieId) => {
+        setIsMuted((prev) => ({
+            ...prev,
+            [movieId]: !prev[movieId],
+        }));
     };
 
-    const handleMuteToggle = (movieId) => {
-        setIsMuted((prev) => {
-            const newMutedState = { ...prev, [movieId]: !prev[movieId] };
+    // Función para obtener el delay basado en el estado de muteo
+    const getAutoplayDelay = () => {
+        return Object.values(isMuted).some(muted => !muted) ? 300000 : 15000; // 5 minutos si hay algún video desmuteado, 15 segundos si todos están muteados
+    };
 
-            const isAnyUnmuted = Object.values(newMutedState).some(muted => !muted);
-            const newDelay = isAnyUnmuted ? 300000 : 15000; 
-
-            if (swiperRef.current) {
-                updateAutoplayDelay(swiperRef.current, newDelay);
-            }
-
-            return newMutedState;
-        });
+    const swiperParams = {
+        centeredSlides: true,
+        autoplay: {
+            delay: getAutoplayDelay(),
+            disableOnInteraction: false
+        },
+        loop: heroItems.length > 1,
+        onSlideChange: handleSlideChange,
+        onInit: (swiper) => preloadNext(swiper, 2),
+        id: "swiper"
     };
 
     return (
-        <Swiper
-            ref={swiperRef}
-            centeredSlides={true}
-            autoplay={{ delay: 15000, disableOnInteraction: false }}
-            loop={heroItems.length > 1}
-            onSlideChange={handleSlideChange}
-            onInit={(swiper) => {
-                swiperRef.current = swiper;
-                preloadNext(swiper, 2);
-            }}
-        >
+        <Swiper {...swiperParams}>
             {heroItems.map((heroItem) => (
                 <SwiperSlide key={heroItem.id}>
                     <div className='flex h-screen max-lg:h-[90vh] [@media(max-height:500px)]:h-[102vh]'>
@@ -153,19 +143,42 @@ export default function Hero() {
                         </div>
                         <div className='flex flex-col justify-end mb-[22vh]'>
                             <div className='flex flex-col ml-12 z-[1] gap-1 max-lg:mx-4 max-2xl:mx-6'>
-                                <div className='flex text-[4rem] font-semibold mb-3 max-lg:justify-center max-lg:text-[3rem]'>
+                                <div className='flex text-[4rem] font-semibold mb-3 max-lg:justify-center max-lg:text-[3rem] [@media(max-height:500px)]:mb-0'>
+                                    <span className="alt-text hidden line-clamp-2 text-center [@media(max-height:500px)]:block">
+                                        {heroItem.title}
+                                    </span>
                                     <img 
                                         src={logoImages[heroItem.id] && `https://image.tmdb.org/t/p/w500${logoImages[heroItem.id]}`} 
-                                        className='max-w-[60vw] max-h-[30vh] max-lg:max-w-[90vw] max-md:max-w-full'
+                                        className='max-w-[60vw] max-h-[30vh] max-lg:max-w-[90vw] max-md:max-w-full [@media(max-height:500px)]:hidden'
                                         alt={heroItem.title} 
                                     />
                                 </div>
+                                <div className='flex gap-[10px] max-lg:justify-center'>
+                                    <div className='flex items-center gap-1'>
+                                        <i className="fa-solid fa-star fa-xs text-yellow-500"></i>
+                                        <p>{parseFloat(heroItem.vote_average).toFixed(1)}</p>
+                                    </div>
+                                    <div className='flex items-center gap-1'>
+                                        <i className='fa-light fa-calendar-lines'></i>
+                                        <p>{heroItem.release_date}</p>
+                                    </div>
+                                    <p className='py-[1px] px-[4px] outline-1 outline outline-gray-400 rounded-md'>{(heroItem.original_language).toUpperCase()}</p>
+                                </div>
+                                <div className='text-[1.05rem] w-[40vw] leading-6 line-clamp-3 max-xl:w-[60vw] max-lg:justify-center max-lg:w-full max-lg:text-center [@media(max-height:500px)]:text-base [@media(max-height:500px)]:leading-[1.35rem]'>
+                                    <p>{heroItem.overview}</p>
+                                </div>
                                 <div className='flex gap-2 mt-2 max-lg:justify-center'>
+                                    <Link to={`/watch/movie/${heroItem.id}`} className='flex items-center gap-2 px-4 py-2 bg-white rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-50'>
+                                        <i className="fa-solid fa-play text-black text-xl" alt="Play Icon" /><p className='text-black'>Watch</p>
+                                    </Link>
+                                    <Link to={`/info/movie/${heroItem.id}`} className='flex items-center gap-[10px] px-4 py-2 bg-white/20 rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-40'>
+                                        <i className="fa-regular fa-circle-info text-xl" alt="info-icon" /><p>Info</p>
+                                    </Link>
                                     <button 
                                         onClick={() => handleMuteToggle(heroItem.id)} 
                                         className='flex items-center gap-2 px-4 py-2 bg-white rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-50 max-[1100px]:hidden'
                                     >
-                                        <i className={`fa-solid ${isMuted[heroItem.id] ? 'fa-volume-xmark' : 'fa-volume-high'} text-black text-xl`} />
+                                        <i className={`fa-solid ${isMuted[heroItem.id] ? 'fa-volume-xmark' : 'fa-volume-high'} text-black text-xl`} alt="Mute/Unmute Icon" />
                                     </button>
                                 </div>
                             </div>
