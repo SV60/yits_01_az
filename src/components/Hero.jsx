@@ -14,7 +14,7 @@ export default function Hero() {
     const [isSmallScreen, setIsSmallScreen] = useState(false);
     const [loadedStates, setLoadedStates] = useState({});
     const [isMuted, setIsMuted] = useState({});
-    const [autoplayDelay, setAutoplayDelay] = useState(15000); // Inicialmente 15 segundos
+    const [autoplayDelay, setAutoplayDelay] = useState(15000); // Estado para el delay
 
     const apiKey = import.meta.env.VITE_API_KEY;
 
@@ -66,16 +66,6 @@ export default function Hero() {
         return () => mediaQuery.removeEventListener('change', handleMediaChange);
     }, [apiKey]);
 
-    useEffect(() => {
-        // Calculamos el nuevo delay en base al estado de muteo
-        const allMuted = Object.values(isMuted).every((value) => value === true);
-        if (allMuted) {
-            setAutoplayDelay(15000); // Muteado, 15 segundos
-        } else {
-            setAutoplayDelay(300000); // Desmuteado, 5 minutos (300000 ms)
-        }
-    }, [isMuted]); // Se ejecuta cuando cambia isMuted
-
     const handleImageLoad = (movieId) => {
         setLoadedStates(prevState => ({
             ...prevState,
@@ -106,16 +96,21 @@ export default function Hero() {
     };
 
     const handleMuteToggle = (movieId) => {
-        setIsMuted((prev) => ({
-            ...prev,
-            [movieId]: !prev[movieId], // Cambia el mute solo para el video actual
-        }));
+        setIsMuted((prev) => {
+            const newMutedState = !prev[movieId];
+            // Cambia el delay del autoplay según el estado de muteo
+            setAutoplayDelay(newMutedState ? 15000 : 300000); // 15 segundos si está muteado, 5 minutos si no
+            return {
+                ...prev,
+                [movieId]: newMutedState, // Cambia el mute solo para el video actual
+            };
+        });
     };
 
     const swiperParams = {
         centeredSlides: true,
         autoplay: {
-            delay: autoplayDelay,
+            delay: autoplayDelay, // Usa el estado de delay
             disableOnInteraction: false
         },
         loop: heroItems.length > 1,
