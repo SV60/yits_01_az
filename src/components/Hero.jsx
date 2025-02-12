@@ -13,7 +13,8 @@ export default function Hero() {
     const [videos, setVideos] = useState({});
     const [isSmallScreen, setIsSmallScreen] = useState(false);
     const [loadedStates, setLoadedStates] = useState({});
-    const [isMuted, setIsMuted] = useState({}); // Ahora es un objeto
+    const [isMuted, setIsMuted] = useState({});
+    const [autoplayDelay, setAutoplayDelay] = useState(15000); // Tiempo inicial del autoplay
 
     const apiKey = import.meta.env.VITE_API_KEY;
 
@@ -65,52 +66,24 @@ export default function Hero() {
         return () => mediaQuery.removeEventListener('change', handleMediaChange);
     }, [apiKey]);
 
-    const handleImageLoad = (movieId) => {
-        setLoadedStates(prevState => ({
-            ...prevState,
-            [movieId]: { ...prevState[movieId], isImageLoaded: true }
-        }));
-    };
-
-    const preloadNext = (swiper, n) => {
-        const startIndex = swiper.activeIndex;
-        const endIndex = startIndex + n + 1;
-        swiper.slides.slice(startIndex, endIndex)
-            .forEach(slide => {
-                const iframe = slide.querySelector('iframe');
-                iframe && iframe.setAttribute('loading', 'lazy');
-            });
-    };
-
-    const handleSlideChange = (swiper) => {
-        // Mutear todos los videos al cambiar de slide
-        setIsMuted((prev) => {
-            const updated = {};
-            heroItems.forEach((item) => {
-                updated[item.id] = true; // Mutea todos
-            });
-            return updated;
-        });
-        preloadNext(swiper, 2);
-    };
-
     const handleMuteToggle = (movieId) => {
-        setIsMuted((prev) => ({
-            ...prev,
-            [movieId]: !prev[movieId], // Cambia el mute solo para el video actual
-        }));
+        setIsMuted((prev) => {
+            const updatedMutedState = { ...prev, [movieId]: !prev[movieId] };
+
+            // Si el video se desmutea, se cambia el delay del slider a 5 minutos
+            setAutoplayDelay(updatedMutedState[movieId] ? 15000 : 300000); // 300000 ms = 5 minutos
+
+            return updatedMutedState;
+        });
     };
 
     const swiperParams = {
         centeredSlides: true,
         autoplay: {
-            delay: 15000,
+            delay: autoplayDelay, // Se actualiza dinámicamente
             disableOnInteraction: false
         },
         loop: heroItems.length > 1,
-        onSlideChange: handleSlideChange,
-        onInit: (swiper) => preloadNext(swiper, 2),
-        id: "swiper"
     };
 
     return (
@@ -128,12 +101,11 @@ export default function Hero() {
                         >
                             {!isSmallScreen && loadedStates[heroItem.id]?.isVideoLoaded && (
                                 <iframe
-                                    src={`https://www.youtube.com/embed/${videos[heroItem.id]}?mute=${isMuted[heroItem.id] ? 1 : 0}&autoplay=1&loop=1&rel=0&fs=0&controls=0&disablekb=1&playlist=${videos[heroItem.id]}&origin=https://mclod.vercel.app/`}
+                                    src={`https://www.youtube.com/embed/${videos[heroItem.id]}?mute=${isMuted[heroItem.id] ? 1 : 0}&autoplay=1&loop=1&rel=0&fs=0&controls=0&disablekb=1&playlist=${videos[heroItem.id]}`}
                                     title={heroItem.title}
                                     allowFullScreen
                                     loading="lazy"
                                     className={`absolute w-[150vw] h-[200vh] top-[-50%] left-[-25%] object-cover border-none transition-opacity duration-500 ease-in ${loadedStates[heroItem.id]?.isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
-                                    onLoad={() => handleImageLoad(heroItem.id)}
                                 />
                             )}
                         </div>
@@ -149,34 +121,22 @@ export default function Hero() {
                                         alt={heroItem.title} 
                                     />
                                 </div>
-                                <div className='flex gap-[10px] max-lg:justify-center'>
-                                    <div className='flex items-center gap-1'>
-                                        <i className="fa-solid fa-star fa-xs text-yellow-500"></i>
-                                        <p>{parseFloat(heroItem.vote_average).toFixed(1)}</p>
-                                    </div>
-                                    <div className='flex items-center gap-1'>
-                                        <i className="fa-light fa-calendar-lines"></i>
-                                        <p>{heroItem.release_date}</p>
-                                    </div>
-                                    <p className='py-[1px] px-[4px] outline-1 outline outline-gray-400 rounded-md'>{(heroItem.original_language).toUpperCase()}</p>
-                                </div>
-                                <div className='text-[1.05rem] w-[40vw] leading-6 line-clamp-3 max-xl:w-[60vw] max-lg:justify-center max-lg:w-full max-lg:text-center [@media(max-height:500px)]:text-base [@media(max-height:500px)]:leading-[1.35rem]'>
-                                    <p>{heroItem.overview}</p>
-                                </div>
                                 <div className='flex gap-2 mt-2 max-lg:justify-center'>
-                                    <Link to={`/watch/movie/${heroItem.id}`} className='flex items-center gap-2 px-4 py-2  bg-white rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-50'>
-                                        <i className="fa-solid fa-play text-black text-xl" alt="Play Icon" /><p className='text-black'>Watch</p>
+                                    <Link to={`/watch/movie/${heroItem.id}`} className='flex items-center gap-2 px-4 py-2 bg-white rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-50'>
+                                        <i className="fa-solid fa-play text-black text-xl" /><p className='text-black'>Watch</p>
                                     </Link>
                                     <Link to={`/info/movie/${heroItem.id}`} className='flex items-center gap-[10px] px-4 py-2 bg-white/20 rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-40'>
-                                        <i className="fa-regular fa-circle-info text-xl" alt="info-icon" /><p>Info</p>
+                                        <i className="fa-regular fa-circle-info text-xl" /><p>Info</p>
                                     </Link>
-                                    {/* Botón de muteo/desmuteo como ícono */}
-                                    <button 
-                                        onClick={() => handleMuteToggle(heroItem.id)} 
-                                        className='flex items-center gap-2 px-4 py-2 bg-white rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-50 max-[1100px]:hidden'
-                                    >
-                                        <i className={`fa-solid ${isMuted[heroItem.id] ? 'fa-volume-xmark' : 'fa-volume-high'} text-black text-xl`} alt="Mute/Unmute Icon" />
-                                    </button>
+                                    {/* Botón de muteo/desmuteo con visibilidad condicional */}
+                                    {!isSmallScreen && (
+                                        <button 
+                                            onClick={() => handleMuteToggle(heroItem.id)} 
+                                            className='flex items-center gap-2 px-4 py-2 bg-white rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-50'
+                                        >
+                                            <i className={`fa-solid ${isMuted[heroItem.id] ? 'fa-volume-xmark' : 'fa-volume-high'} text-black text-xl`} />
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </div>
