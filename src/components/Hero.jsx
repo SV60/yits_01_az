@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
@@ -13,8 +13,8 @@ export default function Hero() {
     const [videos, setVideos] = useState({});
     const [isSmallScreen, setIsSmallScreen] = useState(false);
     const [loadedStates, setLoadedStates] = useState({});
-    const [isMuted, setIsMuted] = useState({});
-    const [autoplayDelay, setAutoplayDelay] = useState(15000); // Tiempo inicial del autoplay
+    const [isMuted, setIsMuted] = useState({}); 
+    const swiperRef = useRef(null); 
 
     const apiKey = import.meta.env.VITE_API_KEY;
 
@@ -66,28 +66,69 @@ export default function Hero() {
         return () => mediaQuery.removeEventListener('change', handleMediaChange);
     }, [apiKey]);
 
+    const handleImageLoad = (movieId) => {
+        setLoadedStates(prevState => ({
+            ...prevState,
+            [movieId]: { ...prevState[movieId], isImageLoaded: true }
+        }));
+    };
+
+    const preloadNext = (swiper, n) => {
+        const startIndex = swiper.activeIndex;
+        const endIndex = startIndex + n + 1;
+        swiper.slides.slice(startIndex, endIndex)
+            .forEach(slide => {
+                const iframe = slide.querySelector('iframe');
+                iframe && iframe.setAttribute('loading', 'lazy');
+            });
+    };
+
+    const handleSlideChange = (swiper) => {
+        setIsMuted((prev) => {
+            const updated = {};
+            heroItems.forEach((item) => {
+                updated[item.id] = true; 
+            });
+            return updated;
+        });
+        preloadNext(swiper, 2);
+    };
+
+    const updateAutoplayDelay = (swiper, delay) => {
+        if (swiper && swiper.autoplay) {
+            swiper.autoplay.stop();
+            swiper.params.autoplay.delay = delay;
+            swiper.autoplay.start();
+        }
+    };
+
     const handleMuteToggle = (movieId) => {
         setIsMuted((prev) => {
-            const updatedMutedState = { ...prev, [movieId]: !prev[movieId] };
+            const newMutedState = { ...prev, [movieId]: !prev[movieId] };
 
-            // Si el video se desmutea, se cambia el delay del slider a 5 minutos
-            setAutoplayDelay(updatedMutedState[movieId] ? 15000 : 300000); // 300000 ms = 5 minutos
+            const isAnyUnmuted = Object.values(newMutedState).some(muted => !muted);
+            const newDelay = isAnyUnmuted ? 300000 : 15000; 
 
-            return updatedMutedState;
+            if (swiperRef.current) {
+                updateAutoplayDelay(swiperRef.current, newDelay);
+            }
+
+            return newMutedState;
         });
     };
 
-    const swiperParams = {
-        centeredSlides: true,
-        autoplay: {
-            delay: autoplayDelay, // Se actualiza dinámicamente
-            disableOnInteraction: false
-        },
-        loop: heroItems.length > 1,
-    };
-
     return (
-        <Swiper {...swiperParams}>
+        <Swiper
+            ref={swiperRef}
+            centeredSlides={true}
+            autoplay={{ delay: 15000, disableOnInteraction: false }}
+            loop={heroItems.length > 1}
+            onSlideChange={handleSlideChange}
+            onInit={(swiper) => {
+                swiperRef.current = swiper;
+                preloadNext(swiper, 2);
+            }}
+        >
             {heroItems.map((heroItem) => (
                 <SwiperSlide key={heroItem.id}>
                     <div className='flex h-screen max-lg:h-[90vh] [@media(max-height:500px)]:h-[102vh]'>
@@ -101,42 +142,31 @@ export default function Hero() {
                         >
                             {!isSmallScreen && loadedStates[heroItem.id]?.isVideoLoaded && (
                                 <iframe
-                                    src={`https://www.youtube.com/embed/${videos[heroItem.id]}?mute=${isMuted[heroItem.id] ? 1 : 0}&autoplay=1&loop=1&rel=0&fs=0&controls=0&disablekb=1&playlist=${videos[heroItem.id]}`}
+                                    src={`https://www.youtube.com/embed/${videos[heroItem.id]}?mute=${isMuted[heroItem.id] ? 1 : 0}&autoplay=1&loop=1&rel=0&fs=0&controls=0&disablekb=1&playlist=${videos[heroItem.id]}&origin=https://mclod.vercel.app/`}
                                     title={heroItem.title}
                                     allowFullScreen
                                     loading="lazy"
                                     className={`absolute w-[150vw] h-[200vh] top-[-50%] left-[-25%] object-cover border-none transition-opacity duration-500 ease-in ${loadedStates[heroItem.id]?.isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                                    onLoad={() => handleImageLoad(heroItem.id)}
                                 />
                             )}
                         </div>
                         <div className='flex flex-col justify-end mb-[22vh]'>
                             <div className='flex flex-col ml-12 z-[1] gap-1 max-lg:mx-4 max-2xl:mx-6'>
-                                <div className='flex text-[4rem] font-semibold mb-3 max-lg:justify-center max-lg:text-[3rem] [@media(max-height:500px)]:mb-0'>
-                                    <span className="alt-text hidden line-clamp-2 text-center [@media(max-height:500px)]:block">
-                                        {heroItem.title}
-                                    </span>
+                                <div className='flex text-[4rem] font-semibold mb-3 max-lg:justify-center max-lg:text-[3rem]'>
                                     <img 
                                         src={logoImages[heroItem.id] && `https://image.tmdb.org/t/p/w500${logoImages[heroItem.id]}`} 
-                                        className='max-w-[60vw] max-h-[30vh] max-lg:max-w-[90vw] max-md:max-w-full [@media(max-height:500px)]:hidden'
+                                        className='max-w-[60vw] max-h-[30vh] max-lg:max-w-[90vw] max-md:max-w-full'
                                         alt={heroItem.title} 
                                     />
                                 </div>
                                 <div className='flex gap-2 mt-2 max-lg:justify-center'>
-                                    <Link to={`/watch/movie/${heroItem.id}`} className='flex items-center gap-2 px-4 py-2 bg-white rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-50'>
-                                        <i className="fa-solid fa-play text-black text-xl" /><p className='text-black'>Watch</p>
-                                    </Link>
-                                    <Link to={`/info/movie/${heroItem.id}`} className='flex items-center gap-[10px] px-4 py-2 bg-white/20 rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-40'>
-                                        <i className="fa-regular fa-circle-info text-xl" /><p>Info</p>
-                                    </Link>
-                                    {/* Botón de muteo/desmuteo con visibilidad condicional */}
-                                    {!isSmallScreen && (
-                                        <button 
-                                            onClick={() => handleMuteToggle(heroItem.id)} 
-                                            className='flex items-center gap-2 px-4 py-2 bg-white rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-50'
-                                        >
-                                            <i className={`fa-solid ${isMuted[heroItem.id] ? 'fa-volume-xmark' : 'fa-volume-high'} text-black text-xl`} />
-                                        </button>
-                                    )}
+                                    <button 
+                                        onClick={() => handleMuteToggle(heroItem.id)} 
+                                        className='flex items-center gap-2 px-4 py-2 bg-white rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-50 max-[1100px]:hidden'
+                                    >
+                                        <i className={`fa-solid ${isMuted[heroItem.id] ? 'fa-volume-xmark' : 'fa-volume-high'} text-black text-xl`} />
+                                    </button>
                                 </div>
                             </div>
                         </div>
