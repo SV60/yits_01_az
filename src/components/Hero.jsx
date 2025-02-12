@@ -173,7 +173,7 @@ export default function Hero() {
                                     {/* Botón de muteo/desmuteo como ícono */}
                                     <button 
                                         onClick={() => handleMuteToggle(heroItem.id)} 
-                                        className='flex items-center gap-2 px-4 py-2 bg-white rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-50'
+                                        className='flex items-center gap-2 px-4 py-2 bg-white rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-50 max-[1101px]:hidden'
                                     >
                                         <i className={`fa-solid ${isMuted[heroItem.id] ? 'fa-volume-xmark' : 'fa-volume-high'} text-black text-xl`} alt="Mute/Unmute Icon" />
                                     </button>
