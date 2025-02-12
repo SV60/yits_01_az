@@ -14,6 +14,7 @@ export default function Hero() {
     const [isSmallScreen, setIsSmallScreen] = useState(false);
     const [loadedStates, setLoadedStates] = useState({});
     const [isMuted, setIsMuted] = useState({});
+    const [autoplayDelay, setAutoplayDelay] = useState(15000); // Inicialmente 15 segundos
 
     const apiKey = import.meta.env.VITE_API_KEY;
 
@@ -65,6 +66,16 @@ export default function Hero() {
         return () => mediaQuery.removeEventListener('change', handleMediaChange);
     }, [apiKey]);
 
+    useEffect(() => {
+        // Calculamos el nuevo delay en base al estado de muteo
+        const allMuted = Object.values(isMuted).every((value) => value === true);
+        if (allMuted) {
+            setAutoplayDelay(15000); // Muteado, 15 segundos
+        } else {
+            setAutoplayDelay(300000); // Desmuteado, 5 minutos (300000 ms)
+        }
+    }, [isMuted]); // Se ejecuta cuando cambia isMuted
+
     const handleImageLoad = (movieId) => {
         setLoadedStates(prevState => ({
             ...prevState,
@@ -83,6 +94,7 @@ export default function Hero() {
     };
 
     const handleSlideChange = (swiper) => {
+        // Mutear todos los videos al cambiar de slide
         setIsMuted((prev) => {
             const updated = {};
             heroItems.forEach((item) => {
@@ -96,19 +108,14 @@ export default function Hero() {
     const handleMuteToggle = (movieId) => {
         setIsMuted((prev) => ({
             ...prev,
-            [movieId]: !prev[movieId],
+            [movieId]: !prev[movieId], // Cambia el mute solo para el video actual
         }));
-    };
-
-    // Función para obtener el delay basado en el estado de muteo
-    const getAutoplayDelay = () => {
-        return Object.values(isMuted).some(muted => !muted) ? 300000 : 15000; // 5 minutos si hay algún video desmuteado, 15 segundos si todos están muteados
     };
 
     const swiperParams = {
         centeredSlides: true,
         autoplay: {
-            delay: getAutoplayDelay(),
+            delay: autoplayDelay,
             disableOnInteraction: false
         },
         loop: heroItems.length > 1,
@@ -174,6 +181,7 @@ export default function Hero() {
                                     <Link to={`/info/movie/${heroItem.id}`} className='flex items-center gap-[10px] px-4 py-2 bg-white/20 rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-40'>
                                         <i className="fa-regular fa-circle-info text-xl" alt="info-icon" /><p>Info</p>
                                     </Link>
+                                    {/* Botón de muteo/desmuteo como ícono */}
                                     <button 
                                         onClick={() => handleMuteToggle(heroItem.id)} 
                                         className='flex items-center gap-2 px-4 py-2 bg-white rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-50 max-[1100px]:hidden'
