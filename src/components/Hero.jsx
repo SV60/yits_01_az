@@ -13,8 +13,7 @@ export default function Hero() {
     const [videos, setVideos] = useState({});
     const [isSmallScreen, setIsSmallScreen] = useState(false);
     const [loadedStates, setLoadedStates] = useState({});
-    const [isMuted, setIsMuted] = useState({});
-    const [autoplayDelay, setAutoplayDelay] = useState(15000); // Estado para el delay
+    const [isMuted, setIsMuted] = useState({}); // Ahora es un objeto
 
     const apiKey = import.meta.env.VITE_API_KEY;
 
@@ -96,22 +95,17 @@ export default function Hero() {
     };
 
     const handleMuteToggle = (movieId) => {
-        setIsMuted((prev) => {
-            const newMutedState = !prev[movieId];
-            // Cambia el delay del autoplay según el estado de muteo
-            setAutoplayDelay(newMutedState ? 15000 : 300000); // 15 segundos si está muteado, 5 minutos si no
-            return {
-                ...prev,
-                [movieId]: newMutedState, // Cambia el mute solo para el video actual
-            };
-        });
+        setIsMuted((prev) => ({
+            ...prev,
+            [movieId]: !prev[movieId], // Cambia el mute solo para el video actual
+        }));
     };
 
     const swiperParams = {
         centeredSlides: true,
         autoplay: {
-            delay: autoplayDelay, // Usa el estado de delay
-            disableOnInteraction: false
+            delay: 15000,
+            disableOnInteraction: true
         },
         loop: heroItems.length > 1,
         onSlideChange: handleSlideChange,
@@ -161,7 +155,7 @@ export default function Hero() {
                                         <p>{parseFloat(heroItem.vote_average).toFixed(1)}</p>
                                     </div>
                                     <div className='flex items-center gap-1'>
-                                        <i className='fa-light fa-calendar-lines'></i>
+                                        <i className="fa-light fa-calendar-lines"></i>
                                         <p>{heroItem.release_date}</p>
                                     </div>
                                     <p className='py-[1px] px-[4px] outline-1 outline outline-gray-400 rounded-md'>{(heroItem.original_language).toUpperCase()}</p>
@@ -170,7 +164,7 @@ export default function Hero() {
                                     <p>{heroItem.overview}</p>
                                 </div>
                                 <div className='flex gap-2 mt-2 max-lg:justify-center'>
-                                    <Link to={`/watch/movie/${heroItem.id}`} className='flex items-center gap-2 px-4 py-2 bg-white rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-50'>
+                                    <Link to={`/watch/movie/${heroItem.id}`} className='flex items-center gap-2 px-4 py-2  bg-white rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-50'>
                                         <i className="fa-solid fa-play text-black text-xl" alt="Play Icon" /><p className='text-black'>Watch</p>
                                     </Link>
                                     <Link to={`/info/movie/${heroItem.id}`} className='flex items-center gap-[10px] px-4 py-2 bg-white/20 rounded-lg text-xl font-bold border-none transition-all duration-150 hover:bg-opacity-40'>
