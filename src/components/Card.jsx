@@ -46,7 +46,6 @@ export default function Card(props) {
                 alt="Poster"
             />
             <div className="card-play group-hover:opacity-100 absolute top-0 left-0 w-full h-full flex justify-center items-center opacity-0 transition-opacity duration-200 z-20">
-                <i className="fa-solid fa-play text-white text-[2.5rem]" alt="Play Icon" />
             </div>
             <div className="card-content group-hover:scale-105 group-hover:opacity-100 max-xl:opacity-100 absolute top-0 left-0 w-full h-full flex justify-end flex-col items-center opacity-0 text-center font-semibold transition-all duration-200 bg-gradient-to-t from-black rounded-md shadow-inner shadow-black z-10">
                 <p className="card-title text-lg font-bold leading-[1.4rem] line-clamp-2">{props.type === 'movie' ? props.item.title : props.item.name}</p>
