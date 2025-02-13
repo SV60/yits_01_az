@@ -43,7 +43,7 @@ export default function Watchlist() {
 
   return (
     <>
-      <div className='flex flex-col bg-white/10 rounded-xl mx-[5vw] max-md:mx-[2vw] px-[0.5vw] max-xl:px-[1vw] max-md:px-[1.5vw] pb-2'>
+      <div className='flex flex-col bg-transparent rounded-xl mx-[5vw] max-md:mx-[2vw] px-[0.5vw] max-xl:px-[1vw] max-md:px-[1.5vw] pb-2'>
         <div className='flex justify-between items-center order-[-1] mt-2 mb-4 gap-8'>
           <div className='flex justify-between w-screen'>
             <div>
