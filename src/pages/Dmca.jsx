@@ -4,7 +4,7 @@ import Footer from '../components/Footer'
 
 export default function Dmca() {
     useEffect(() => {
-        document.title = 'DMCA - zmov';
+        document.title = 'DMCA - MeeeCloud';
         window.scrollTo(0, 0);
     })
 
