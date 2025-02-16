@@ -12,7 +12,7 @@ export default function Player() {
     const [season, setSeason] = useState(null);
     const [episode, setEpisode] = useState(null);
     const [selectedServer, setSelectedServer] = useState(() => {
-        return localStorage.getItem('preferredServer') || 'PRO';
+        return localStorage.getItem('preferredServer') || 'ONE';
     });
 
     const playerURLs = import.meta.env
