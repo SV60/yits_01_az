@@ -214,37 +214,38 @@ export default function Player() {
                         onChange={handleServerChange}
                         className='px-4 py-1 m-1 text-xl bg-black border-2 border-white border-opacity-20 rounded-lg cursor-pointer'
                     >   
-                        <option style={{backgroundColor: "rgb(50, 50, 50)"}} selected disabled>ADFREE</option>
-                        <option value="VIDLINK">VIDLINK</option>
+                        <option style={{backgroundColor: "rgb(50, 50, 50)"}} disabled>ENGLISH</option>
+                        {/* <option value="VIDLINK">VIDLINK</option>
                         <option value="SEVENX">SEVENX</option>
                         <option value="HEXA">HEXA</option>
                         <option value="FLICKY">FLICKY</option>
                         <option value="SPEN">SPEN</option>
-                        <option style={{backgroundColor: "rgb(50, 50, 50)"}} selected disabled>ADS</option>
+                        <option style={{backgroundColor: "rgb(50, 50, 50)"}} disabled>ADS</option>
                         <option value="VIDBINGE">BINGE (4K)</option>
                         <option value="RIVE">RIVE</option>
                         <option value="PRO">PRO</option>
                         <option value="VIP">VIP</option>
                         <option value="CLUB">CLUB</option>
-                        <option value="XYZ">XYZ</option>
-                        <option value="ONE">ONE</option>
-                        <option value="CC">CC</option>
+                        <option value="XYZ">XYZ</option> */}
+                        <option value="ONE" selected>PLAYER 1</option>
+                        {/* <option value="CC">CC</option>
                         <option value="MULTI">MULTI</option>
                         <option value="SS">SMASHY</option>
-                        <option style={{backgroundColor: "rgb(50, 50, 50)"}} selected disabled>LANGUAGE</option>
+                        <option style={{backgroundColor: "rgb(50, 50, 50)"}} disabled>LANGUAGE</option>
                         <option value="FRENCH">FRENCH</option>
                         <option value="INDIAN">INDIAN</option>
                         <option value="PORT">PORT</option>
                         <option value="RUSSIAN">RUSSIAN</option>
                         <option value="MULTLANG">MULTLANG</option>
-                        <option style={{backgroundColor: "rgb(50, 50, 50)"}} selected disabled>ANIME</option>
+                        <option style={{backgroundColor: "rgb(50, 50, 50)"}} disabled>ANIME</option>
                         <option value="ANICDNDUB">ANICDN-DUB</option>
                         <option value="ANICDNSUB">ANICDN-SUB</option>
                         <option value="ANI2DUB">2ANI-DUB</option>
                         <option value="ANI2SUB">2ANI-SUB</option>
                         <option value="AUTOANIDUB">AUTOANI-DUB</option>
                         <option value="AUTOANISUB">AUTOANI-SUB</option>
-                        <option value="FLICKYANI">FLICKYANI</option>
+                        <option value="FLICKYANI">FLICKYANI</option> */}
+
                     </select>
                     {type === 'tv' && season && episode && (
                         <Link to={nextEpisodeLink} ><i className="fa-solid fa-arrow-right text-3xl mr-2 ml-1 hover:opacity-50" alt="Next" /></Link>
