@@ -206,9 +206,9 @@ export default function Player() {
             <div className='flex justify-between w-screen absolute' style={{top: gridPos}}>
                 <Link to={`/info/${type}/${id}`}><i className="fa-solid fa-arrow-left text-3xl ml-2 mt-2 hover:opacity-50" alt="Back" /></Link>
                 <div className='flex items-center'>
-                    <a href={`https://dl.vidsrc.vip/${type}/${id}${type === 'tv' ? `/${season}/${episode}` : ''}`} target="_blank" rel="noopener noreferrer">
-                        <i className="fa-solid fa-download text-3xl mr-1 hover:opacity-50" alt="Back" />
-                    </a>
+                    {/* <a href={`https://dl.vidsrc.vip/${type}/${id}${type === 'tv' ? `/${season}/${episode}` : ''}`} target="_blank" rel="noopener noreferrer">
+                        <i className="fa-solid fa-download text-3xl mr-1 hover:opacity-50" alt="Download" />
+                    </a> */}
                     <select 
                         name="servers" 
                         value={selectedServer} 
