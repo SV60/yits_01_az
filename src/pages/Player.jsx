@@ -111,7 +111,7 @@ export default function Player() {
                 setImdbId(data.imdb_id);
                 setAnimeTitle(data.alternative_titles.results.find((item) => item.type === "Romaji")?.title.replace(/\s+/g, '-'));                  
 
-                document.title = `${data.title || data.name} ${type === "movie" ? '' : `S${seasonParam}E${episodeParam}`} - zmov`;
+                document.title = `${data.title || data.name} ${type === "movie" ? '' : `S${seasonParam}E${episodeParam}`} - MeeeCloud`;
 
                 if (type === 'tv') {
                     setTotalSeasons(data.number_of_seasons);
