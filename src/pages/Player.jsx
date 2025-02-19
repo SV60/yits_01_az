@@ -226,11 +226,11 @@ export default function Player() {
                         <option value="VIDBINGE">BINGE</option>
                         <option value="EASY">EASY</option>
                         <option value="RIVE">RIVE</option>
-                        */}
                         <option value="PRO">PRO</option>
-                        {/* 
                         <option value="VIP">VIP</option>
+                        */}
                         <option value="CLUB">CLUB</option>
+                        {/* 
                         <option value="XYZ">XYZ</option> 
                         */}
                         <option value="ONE" selected>ONE</option>
