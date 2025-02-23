@@ -95,11 +95,23 @@ export default function Hero() {
     };
 
     const handleMuteToggle = (movieId) => {
-        setIsMuted((prev) => ({
-            ...prev,
-            [movieId]: !prev[movieId], // Cambia el mute solo para el video actual
-        }));
+        setIsMuted((prev) => {
+            const isNowMuted = !prev[movieId];
+            if (!isNowMuted) {
+                // Encuentra el iframe del video y llama al play() para empezar a reproducir con sonido
+                const iframe = document.querySelector(`iframe[src*="${videos[movieId]}"]`);
+                if (iframe) {
+                    const videoPlayer = iframe.contentWindow;
+                    videoPlayer.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                }
+            }
+            return {
+                ...prev,
+                [movieId]: isNowMuted,
+            };
+        });
     };
+
 
     const swiperParams = {
         centeredSlides: true,
