@@ -101,13 +101,22 @@ export default function Hero() {
             
             if (iframe) {
                 const videoPlayer = iframe.contentWindow;
+                
                 if (isNowMuted) {
                     // Mutear el video
                     videoPlayer.postMessage('{"event":"command","func":"mute","args":""}', '*');
                 } else {
                     // Desmutear tras interacción y continuar reproducción
                     videoPlayer.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-                    videoPlayer.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+    
+                    // Truco: Simular una segunda interacción para permitir autoplay con sonido
+                    iframe.focus(); // Enfocar el iframe
+                    iframe.click(); // Simular clic en el iframe (solo algunos navegadores lo aceptan)
+    
+                    // Pequeño retraso antes de intentar reproducir
+                    setTimeout(() => {
+                        videoPlayer.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                    }, 100); // Espera 100 ms para asegurar que la interacción sea registrada
                 }
             }
     
