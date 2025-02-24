@@ -106,16 +106,19 @@ export default function Hero() {
                     // Mutear el video
                     videoPlayer.postMessage('{"event":"command","func":"mute","args":""}', '*');
                 } else {
-                    // Desmutear el video
-                    videoPlayer.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-                    
-                    // Solicitar confirmación para reproducir con sonido
-                    const userConfirmed = window.confirm("¿Quieres reproducir el video con sonido?");
-                    
-                    if (userConfirmed) {
-                        // Si el usuario acepta, reproducir el video
-                        videoPlayer.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-                    }
+                    // Truco: Enfocar dos veces con un pequeño delay entre ellos
+                    iframe.focus();
+                    setTimeout(() => {
+                        iframe.focus(); // Segundo focus para reforzar la "interacción"
+                        
+                        // Desmutear después del doble focus
+                        videoPlayer.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+                        
+                        // Esperar un poco antes de intentar reproducir
+                        setTimeout(() => {
+                            videoPlayer.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                        }, 350); // Espera 350 ms antes de reproducir
+                    }, 100); // Pequeña espera entre los dos focus
                 }
             }
     
