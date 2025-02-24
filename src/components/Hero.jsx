@@ -97,21 +97,26 @@ export default function Hero() {
     const handleMuteToggle = (movieId) => {
         setIsMuted((prev) => {
             const isNowMuted = !prev[movieId];
-            if (!isNowMuted) {
-                // Encuentra el iframe del video y llama al play() para empezar a reproducir con sonido
-                const iframe = document.querySelector(`iframe[src*="${videos[movieId]}"]`);
-                if (iframe) {
-                    const videoPlayer = iframe.contentWindow;
+            const iframe = document.querySelector(`iframe[src*="${videos[movieId]}"]`);
+            
+            if (iframe) {
+                const videoPlayer = iframe.contentWindow;
+                if (isNowMuted) {
+                    // Mutear el video
+                    videoPlayer.postMessage('{"event":"command","func":"mute","args":""}', '*');
+                } else {
+                    // Desmutear tras interacción y continuar reproducción
+                    videoPlayer.postMessage('{"event":"command","func":"unMute","args":""}', '*');
                     videoPlayer.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
                 }
             }
+    
             return {
                 ...prev,
                 [movieId]: isNowMuted,
             };
         });
     };
-
 
     const swiperParams = {
         centeredSlides: true,
